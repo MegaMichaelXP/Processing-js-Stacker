@@ -1,6 +1,8 @@
 public class Board {
   
   MovingBlocks moving;
+  Block finalBlock;
+  Block collapseBlock;
   
   protected int x_pos, y_pos;
   protected int xAt, yAt;
@@ -9,11 +11,23 @@ public class Board {
   protected int blockCount;
   protected int gameStatus;
   protected int fallInterval;
+  protected int flashInterval;
+  protected int collapseInterval;
+  protected int collapseTime;
+  protected int flashes;
+  protected int startFlash;
+  protected int missed;
   protected int fallTime;
   protected int[][] layer;
   protected boolean blocksMoving;
+  protected boolean flash;
   protected boolean fallAnimation;
+  protected boolean flashingAnimation;
+  protected boolean finalFlash;
+  protected boolean collapse;
+  protected boolean perfect;
   protected ArrayList<Block> blocks;
+  protected ArrayList<Block> finalBlocks;
   protected ArrayList<Block> falling;
   
   public Board(int x, int y, int numRows, int numCols, int cellSize) {
@@ -24,12 +38,21 @@ public class Board {
     this.cellSize = cellSize;
     layer = null;
     blocks = new ArrayList<Block>();
+    finalBlocks = new ArrayList<Block>();
     falling = new ArrayList<Block>();
     blocksMoving = true;
     fallAnimation = false;
-    fallInterval = 100;
+    flashingAnimation = false;
+    collapse = false;
+    perfect = false;
+    flash = true;
+    fallInterval = 200;
+    flashInterval = 200;
+    collapseInterval = 30;
     gameStatus = 1;
     blockCount = 3;
+    flashes = 0;
+    missed = 0;
     moving = new MovingBlocks(14, 3, blockCount, blockCount, 1, 100, 0, 6);
   }
   
@@ -48,10 +71,45 @@ public class Board {
         drawLayerCell(j,i,xAt,yAt);
       }
     }
+    if (perfect) {
+      sleep(500);
+      perfect = false;
+    }
     for (Block b: blocks) {
       xAt = b.col() * cellSize;
       yAt = b.row() * cellSize;
       b.show(xAt,yAt,cellSize);
+    }
+    if (finalFlash && !collapse) {
+      //finalBlock = blocks.get(blocks.size() - 1);
+      if (millis() - startFlash >= flashInterval) {
+        for (Block f: finalBlocks) {
+          f.toggle();
+        }
+        startFlash = millis();
+        flashes++;
+        //finalBlock.toggle();
+      }
+      if (flashes == 7) {
+        flashes = 0;
+        finalFlash = false;
+        collapseTime = millis();
+        collapse = true;
+      }
+    }
+    if (collapse) {
+      collapseBlock = blocks.get(0);
+      if (millis() - collapseTime >= collapseInterval) {
+        if (collapseBlock.row() == rows - 1) {
+          blocks.remove(0);
+          if (blocks.size() == 0) {
+            collapse = false;
+          }
+        } else {
+          collapseBlock.moveRow(1);
+        }
+        collapseTime = millis();
+      }
     }
     if (falling.size() > 0 && !fallAnimation) {
       fallTime = millis();
@@ -65,12 +123,37 @@ public class Board {
     if (fallAnimation) {
       if (millis() - fallTime >= fallInterval) {
         for (int i = falling.size() - 1; i >= 0; i--) {
-          Block f = falling.get(i);
-          if ((blockAt((f.row() + 1), f.col())) || f.row() == rows - 1) {
-            
+          if (falling.size() > 0) {
+            Block f = falling.get(i);
+            if ((blockAt((f.row() + 1), f.col())) || f.row() == rows - 1) {
+              if (!flashingAnimation) {
+                startFlash = millis();
+                flashingAnimation = true;
+              } else {
+                if (millis() - startFlash >= flashInterval) {
+                  for (Block g: falling) {
+                    g.toggle();
+                  }
+                  startFlash = millis();
+                  flashes++;
+                }
+                if (flashes == 7) {
+                  falling.clear();
+                  flashingAnimation = false;
+                  flashes = 0;
+                }
+              }
+            } else {
+              f.moveRow(1);
+            }
           }
         }
+        fallTime = millis();
       }
+    }
+    if (fallAnimation && falling.size() == 0) {
+      moving.startBlocks();
+      fallAnimation = false;
     }
     xAt = moving.col() * cellSize;
     yAt = moving.row() * cellSize;
@@ -155,29 +238,43 @@ public class Board {
   
   public void placeBlocks() {
     moving.stopBlocks();
+    blockCount = moving.getBlockCount();
     int[][] newBlocks = moving.getCoordinates();
     for (int i = 0; i < newBlocks.length; i++) {
       blocks.add(new Block(newBlocks[i][0], newBlocks[i][1]));
+      print(newBlocks[i][1] + " ");
     }
+    println();
     checkBlocks();
     if (gameStatus == 1) {
       moving.setBlockCount(blockCount);
       moving.next();
-      moving.startBlocks();
+      if (falling.size() == 0) {
+        moving.startBlocks();
+      }
     }
   }
   
   public void checkBlocks() {
+    perfect = true;
     for (Block b: blocks) {
       if (!((blockAt((b.row() + 1), b.col())) || b.row() == rows - 1)) {
         blockCount--;
+        missed++;
+        perfect = false;
         if (blockCount == 0) {
           gameStatus = 0;
+          startFlash = millis();
+          for (int i = 0; i < missed; i++) {
+            finalBlocks.add(blocks.get(blocks.size() - i - 1));
+          }
+          finalFlash = true;
         }
       }
     }
     if (gameStatus == 1) {
       dropBlocks();
+      missed = 0;
     }
   }
   
@@ -192,7 +289,12 @@ public class Board {
   }
   
   public void continueGame() {
-    
+    moving.startBlocks();
+    gameStatus = 1;
+  }
+  
+  public int status() {
+    return gameStatus;
   }
   
   public int getRows() {return rows;}

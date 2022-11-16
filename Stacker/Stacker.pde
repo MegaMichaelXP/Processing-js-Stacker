@@ -2,7 +2,8 @@ Board theBoard;
 
 int[] mouseCoords;
 
-boolean spacePressed;
+boolean spacePressed = false;
+boolean cPressed = false;
 
 void setup() {
   size(800,600);
@@ -20,7 +21,11 @@ void mousePressed() {
 
 void keyPressed() {
   if (key == ' ' && !spacePressed) {
-    theBoard.placeBlocks();
+    if (theBoard.status() == 1) {
+      theBoard.placeBlocks();
+    } else if (theBoard.status() == 0) {
+      setup();
+    }
     spacePressed = true;
   }
 }
@@ -28,5 +33,7 @@ void keyPressed() {
 void keyReleased() {
   if (key == ' ') {
     spacePressed = false;
+  } else if (key == 'r') {
+    //rPressed = false;
   }
 }

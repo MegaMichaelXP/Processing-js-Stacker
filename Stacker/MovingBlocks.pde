@@ -86,6 +86,14 @@ public class MovingBlocks extends BoardItem {
     moveRow(-1);
     fullBlockCount = blockCount;
     updateCol(int(random(leftBounds, rightBounds + 1)));
+    if (row() == 11 && fullBlockCount > 2) {
+      fullBlockCount = 2;
+      blockCount = 2;
+    }
+    if (row() == 5 && fullBlockCount > 1) {
+      fullBlockCount = 1;
+      blockCount = 1;
+    }
     if (newDirection == 0) {
       direction = 1;
     } else {
@@ -110,15 +118,26 @@ public class MovingBlocks extends BoardItem {
   
   public int[][] getCoordinates() {
     int[][] coords = new int[blockCount][2];
-    for (int i = 0; i < blockCount; i++) {
-      coords[i][0] = row();
-      coords[i][1] = col() - (direction * i);
+    if (direction == 1) {
+      for (int i = blockCount - 1; i >= 0; i--) {
+        coords[(blockCount - 1) - i][0] = row();
+        coords[(blockCount - 1) - i][1] = col() - i;
+        print(i + ", " + coords[i][1] + "|");
+      }
+      println();
+    } else if (direction == -1) {
+      for (int j = 0; j < coords.length; j++) {
+        coords[j][0] = row();
+        coords[j][1] = col() + j;
+        print(j + ", " + coords[j][1] + "|");
+      }
+      println();
     }
     return coords;
   }
   
   public int getBlockCount() {
-    return fullBlockCount;
+    return blockCount;
   }
   
   public void setBlockCount(int newBlockCount) {
