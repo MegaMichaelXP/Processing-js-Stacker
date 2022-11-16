@@ -116,5 +116,14 @@ public class MovingBlocks extends BoardItem {
     }
     return coords;
   }
+  
+  public int getBlockCount() {
+    return fullBlockCount;
+  }
+  
+  public void setBlockCount(int newBlockCount) {
+    fullBlockCount = newBlockCount;
+    blockCount = newBlockCount;
+  }
 
 }

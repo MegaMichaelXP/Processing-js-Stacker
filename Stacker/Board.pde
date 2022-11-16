@@ -1,17 +1,20 @@
 public class Board {
   
-  Block newBlock;
   MovingBlocks moving;
   
   protected int x_pos, y_pos;
   protected int xAt, yAt;
   protected int cellSize;
   protected int rows, cols;
-  protected int score;
-  protected int clearIndex = 4;
+  protected int blockCount;
+  protected int gameStatus;
+  protected int fallInterval;
+  protected int fallTime;
   protected int[][] layer;
   protected boolean blocksMoving;
+  protected boolean fallAnimation;
   protected ArrayList<Block> blocks;
+  protected ArrayList<Block> falling;
   
   public Board(int x, int y, int numRows, int numCols, int cellSize) {
     x_pos = x;
@@ -21,10 +24,13 @@ public class Board {
     this.cellSize = cellSize;
     layer = null;
     blocks = new ArrayList<Block>();
-    newBlock = new Block(0,0);
+    falling = new ArrayList<Block>();
     blocksMoving = true;
-    moving = new MovingBlocks(14, 3, 3, 3, 1, 100, 0, 6);
-    //blocks.add(newBlock);
+    fallAnimation = false;
+    fallInterval = 100;
+    gameStatus = 1;
+    blockCount = 3;
+    moving = new MovingBlocks(14, 3, blockCount, blockCount, 1, 100, 0, 6);
   }
   
   public void show() {
@@ -46,6 +52,25 @@ public class Board {
       xAt = b.col() * cellSize;
       yAt = b.row() * cellSize;
       b.show(xAt,yAt,cellSize);
+    }
+    if (falling.size() > 0 && !fallAnimation) {
+      fallTime = millis();
+      fallAnimation = true;
+    }
+    for (Block f: falling) {
+      xAt = f.col() * cellSize;
+      yAt = f.row() * cellSize;
+      f.show(xAt,yAt,cellSize);
+    }
+    if (fallAnimation) {
+      if (millis() - fallTime >= fallInterval) {
+        for (int i = falling.size() - 1; i >= 0; i--) {
+          Block f = falling.get(i);
+          if ((blockAt((f.row() + 1), f.col())) || f.row() == rows - 1) {
+            
+          }
+        }
+      }
     }
     xAt = moving.col() * cellSize;
     yAt = moving.row() * cellSize;
@@ -99,6 +124,15 @@ public class Board {
     return theCol;
   }
   
+  public boolean blockAt(int row, int col) {
+    for (Block b: blocks) {
+      if (b.row() == row && b.col() == col) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
   public void sleep(int wait) {
     int time = millis();
     boolean waiting = true;
@@ -125,8 +159,40 @@ public class Board {
     for (int i = 0; i < newBlocks.length; i++) {
       blocks.add(new Block(newBlocks[i][0], newBlocks[i][1]));
     }
-    moving.next();
-    moving.startBlocks();
+    checkBlocks();
+    if (gameStatus == 1) {
+      moving.setBlockCount(blockCount);
+      moving.next();
+      moving.startBlocks();
+    }
+  }
+  
+  public void checkBlocks() {
+    for (Block b: blocks) {
+      if (!((blockAt((b.row() + 1), b.col())) || b.row() == rows - 1)) {
+        blockCount--;
+        if (blockCount == 0) {
+          gameStatus = 0;
+        }
+      }
+    }
+    if (gameStatus == 1) {
+      dropBlocks();
+    }
+  }
+  
+  public void dropBlocks() {
+    for (int i = blocks.size() - 1; i >= 0; i--) {
+      Block b = blocks.get(i);
+      if (!((blockAt((b.row() + 1), b.col())) || b.row() == rows - 1)) {
+        falling.add(b);
+        blocks.remove(i);
+      }
+    }
+  }
+  
+  public void continueGame() {
+    
   }
   
   public int getRows() {return rows;}
