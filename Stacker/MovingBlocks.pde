@@ -17,7 +17,7 @@ public class MovingBlocks extends BoardItem {
     this.speed = speed;
     this.leftBounds = leftBounds;
     this.rightBounds = rightBounds;
-    moving = true;
+    moving = false;
     time = millis();
   }
   

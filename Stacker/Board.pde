@@ -24,8 +24,10 @@ public class Board {
   protected boolean fallAnimation;
   protected boolean flashingAnimation;
   protected boolean finalFlash;
+  protected boolean resetReady;
   protected boolean collapse;
-  protected boolean perfect;
+  protected boolean perfect1;
+  protected boolean perfect2;
   protected ArrayList<Block> blocks;
   protected ArrayList<Block> finalBlocks;
   protected ArrayList<Block> falling;
@@ -44,12 +46,14 @@ public class Board {
     fallAnimation = false;
     flashingAnimation = false;
     collapse = false;
-    perfect = false;
+    perfect1 = false;
+    perfect2 = false;
     flash = true;
+    resetReady = false;
     fallInterval = 200;
     flashInterval = 200;
     collapseInterval = 30;
-    gameStatus = 1;
+    gameStatus = -1;
     blockCount = 3;
     flashes = 0;
     missed = 0;
@@ -70,10 +74,6 @@ public class Board {
         rect(xAt,yAt,cellSize,cellSize);
         drawLayerCell(j,i,xAt,yAt);
       }
-    }
-    if (perfect) {
-      sleep(500);
-      perfect = false;
     }
     for (Block b: blocks) {
       xAt = b.col() * cellSize;
@@ -104,6 +104,7 @@ public class Board {
           blocks.remove(0);
           if (blocks.size() == 0) {
             collapse = false;
+            resetReady = true;
           }
         } else {
           collapseBlock.moveRow(1);
@@ -159,6 +160,16 @@ public class Board {
     yAt = moving.row() * cellSize;
     moving.show(xAt,yAt,cellSize);
     popMatrix();
+    if (perfect1 && gameStatus == 1) {
+      if (perfect2) {
+        sleep(500);
+        moving.startBlocks();
+        perfect1 = false;
+        perfect2 = false;
+      } else {
+        perfect2 = true;
+      }
+    }
   }
   
   protected void drawLayerCell(int rowId, int colId, int xPos, int yPos) {
@@ -226,6 +237,15 @@ public class Board {
     }
   }
   
+  public void startGame() {
+    gameStatus = 1;
+    moving.startBlocks();
+  }
+  
+  public void prizeClaim() {
+    resetReady = true;
+  }
+  
   public void toggle() {
     if (blocksMoving) {
       moving.stopBlocks();
@@ -246,22 +266,28 @@ public class Board {
     }
     println();
     checkBlocks();
+    if (newBlocks[0][0] == 4) {
+      gameStatus = 2;
+    }
+    if (newBlocks[0][0] == 0) {
+      gameStatus = 3;
+    }
     if (gameStatus == 1) {
       moving.setBlockCount(blockCount);
       moving.next();
-      if (falling.size() == 0) {
+      if (falling.size() == 0 && !perfect1) {
         moving.startBlocks();
       }
     }
   }
   
   public void checkBlocks() {
-    perfect = true;
+    perfect1 = true;
     for (Block b: blocks) {
       if (!((blockAt((b.row() + 1), b.col())) || b.row() == rows - 1)) {
         blockCount--;
         missed++;
-        perfect = false;
+        perfect1 = false;
         if (blockCount == 0) {
           gameStatus = 0;
           startFlash = millis();
@@ -289,12 +315,18 @@ public class Board {
   }
   
   public void continueGame() {
+    moving.next();
     moving.startBlocks();
+    perfect1 = false;
     gameStatus = 1;
   }
   
   public int status() {
     return gameStatus;
+  }
+  
+  public boolean readyToReset() {
+    return resetReady;
   }
   
   public int getRows() {return rows;}
