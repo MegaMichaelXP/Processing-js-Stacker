@@ -122,16 +122,12 @@ public class MovingBlocks extends BoardItem {
       for (int i = blockCount - 1; i >= 0; i--) {
         coords[(blockCount - 1) - i][0] = row();
         coords[(blockCount - 1) - i][1] = col() - i;
-        print(i + ", " + coords[i][1] + "|");
       }
-      println();
     } else if (direction == -1) {
       for (int j = 0; j < coords.length; j++) {
         coords[j][0] = row();
         coords[j][1] = col() + j;
-        print(j + ", " + coords[j][1] + "|");
       }
-      println();
     }
     return coords;
   }

@@ -262,9 +262,7 @@ public class Board {
     int[][] newBlocks = moving.getCoordinates();
     for (int i = 0; i < newBlocks.length; i++) {
       blocks.add(new Block(newBlocks[i][0], newBlocks[i][1]));
-      print(newBlocks[i][1] + " ");
     }
-    println();
     checkBlocks();
     if (newBlocks[0][0] == 4) {
       gameStatus = 2;
