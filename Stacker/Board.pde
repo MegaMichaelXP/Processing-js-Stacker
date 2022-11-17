@@ -85,8 +85,8 @@ public class Board {
     flashes = 0;
     missed = 0;
     moving = new MovingBlocks(14, 3, blockCount, blockCount, 1, 80, 0, 6);
-    minor = new BlockText(4,3,"MINOR PRIZE");
-    major = new BlockText(0,3,"MAJOR PRIZE");
+    minor = new BlockText(4,3,"MINOR  PRIZE");
+    major = new BlockText(0,3,"MAJOR  PRIZE");
     minorL = new Marker(4,0,0);
     minorR = new Marker(4,numCols - 1,1);
     majorL = new Marker(0,0,0);
