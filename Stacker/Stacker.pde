@@ -37,8 +37,10 @@ void draw() {
   textSize(56);
   if (points < 0) {
     fill(180,0,0);
+    text("-$" + (-1 * points), 560, 150);
+  } else {
+    text("$" + points, 560, 150);
   }
-  text("$" + points, 560, 150);
   textSize(30);
   fill(0);
   text("Wager: $" + wager, 560, 350);
