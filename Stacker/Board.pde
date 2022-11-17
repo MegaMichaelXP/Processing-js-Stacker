@@ -3,6 +3,8 @@ public class Board {
   MovingBlocks moving;
   Block finalBlock;
   Block collapseBlock;
+  BlockText minor;
+  BlockText major;
   
   protected int x_pos, y_pos;
   protected int xAt, yAt;
@@ -58,6 +60,8 @@ public class Board {
     flashes = 0;
     missed = 0;
     moving = new MovingBlocks(14, 3, blockCount, blockCount, 1, 100, 0, 6);
+    minor = new BlockText(4,3,"MINOR PRIZE");
+    major = new BlockText(0,3,"MAJOR PRIZE");
   }
   
   public void show() {
@@ -98,6 +102,7 @@ public class Board {
       }
     }
     if (collapse) {
+      gameStatus = 0;
       collapseBlock = blocks.get(0);
       if (millis() - collapseTime >= collapseInterval) {
         if (collapseBlock.row() == rows - 1) {
@@ -159,6 +164,12 @@ public class Board {
     xAt = moving.col() * cellSize;
     yAt = moving.row() * cellSize;
     moving.show(xAt,yAt,cellSize);
+    xAt = (minor.col() * cellSize) + cellSize/2;
+    yAt = (minor.row() * cellSize) + cellSize/2;
+    minor.show(xAt,yAt,cellSize);
+    xAt = (major.col() * cellSize) + cellSize/2;
+    yAt = (major.row() * cellSize) + cellSize/2;
+    major.show(xAt,yAt,cellSize);
     popMatrix();
     if (perfect1 && gameStatus == 1) {
       if (perfect2) {
@@ -264,12 +275,6 @@ public class Board {
       blocks.add(new Block(newBlocks[i][0], newBlocks[i][1]));
     }
     checkBlocks();
-    if (newBlocks[0][0] == 4) {
-      gameStatus = 2;
-    }
-    if (newBlocks[0][0] == 0) {
-      gameStatus = 3;
-    }
     if (gameStatus == 1) {
       moving.setBlockCount(blockCount);
       moving.next();
@@ -281,6 +286,7 @@ public class Board {
   
   public void checkBlocks() {
     perfect1 = true;
+    int[][] newBlocks = moving.getCoordinates();
     for (Block b: blocks) {
       if (!((blockAt((b.row() + 1), b.col())) || b.row() == rows - 1)) {
         blockCount--;
@@ -293,6 +299,13 @@ public class Board {
             finalBlocks.add(blocks.get(blocks.size() - i - 1));
           }
           finalFlash = true;
+        }
+      } else {
+        if (newBlocks[0][0] == 4) {
+          gameStatus = 2;
+        }
+        if (newBlocks[0][0] == 0) {
+          gameStatus = 3;
         }
       }
     }
