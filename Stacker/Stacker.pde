@@ -35,8 +35,12 @@ void draw() {
   fill(0);
   text(statusText, (width/2), 550);
   textSize(56);
+  if (points < 0) {
+    fill(180,0,0);
+  }
   text("$" + points, 560, 150);
   textSize(30);
+  fill(0);
   text("Wager: $" + wager, 560, 350);
   rectMode(CENTER);
   fill(0);
