@@ -11,11 +11,32 @@
 			<h1>Michael's Entertainment - Stacker</h1>
 		</header>
 			<section id="content">
-				<canvas id="Minesweeper" data-processing-sources="Stacker/Stacker.pde Stacker/Board.pde Stacker/BoardItem.pde Stacker/Cell.pde Stacker/Block.pde Stacker/MovingBlocks.pde Stacker/BlockText.pde">
+				<canvas id="Minesweeper" data-processing-sources="Stacker/Stacker.pde Stacker/Board.pde Stacker/BoardItem.pde Stacker/Cell.pde Stacker/Block.pde Stacker/MovingBlocks.pde Stacker/BlockText.pde Stacker/Marker.pde">
 				</canvas>
 		    </section>
 	    <footer>
-		    
+		    <br>
+		    <inst>Controls:</inst>
+		    <ul>
+		    	<li>Spacebar - Stack blocks/Continue game</li>
+		    	<li>Z - Claim prize</li>
+			</ul>
+            <br>
+            <inst>Gameplay:</inst>
+            <ul>
+                <li>Stop each level of blocks on top of each other to build the tower.</li>
+                <li>Missed blocks are removed from the next level.</li>
+                <li>If all blocks are missed, the game will end.</li>
+                <li>At the minor prize level, you may take the prize or continue and try for a major prize</li>
+                <li>No prize is awarded if you continue and miss</li>
+            </ul>
+			<br>
+			<inst>Wagers and rewards:</inst>
+			<ul>
+                <li>Wager is paid when the game starts.</li>
+			    <li>Minor prize awards 2x wager.</li>
+			    <li>Major prize awards 5x wager.</li>
+			</ul>
 	    </footer>
 	</body>
 </html>

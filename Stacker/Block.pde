@@ -2,20 +2,22 @@ public class Block extends BoardItem {
   
   protected boolean active;
   
-  Block(int rowAt, int colAt) {
+  Block(int rowAt, int colAt, boolean active) {
     super(rowAt, colAt);
-    active = true;
+    this.active = active;
   }
   
   public void show (int xAt, int yAt, int cellSize) {
+    pushMatrix();
     if (active) {
-      pushMatrix();
       fill(0,200,0);
-      translate(xAt,yAt);
-      rectMode(CORNER);
-      rect(0,0,cellSize,cellSize);
-      popMatrix();
+    } else {
+      fill(0,60,0);
     }
+    translate(xAt,yAt);
+    rectMode(CORNER);
+    rect(0,0,cellSize,cellSize);
+    popMatrix();
   }
   
   public void toggle() {

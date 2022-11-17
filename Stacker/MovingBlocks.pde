@@ -114,6 +114,7 @@ public class MovingBlocks extends BoardItem {
         blockCount = int(random(1,(fullBlockCount + 1)));
       }
     }
+    speed -= 2;
   }
   
   public int[][] getCoordinates() {
