@@ -12,7 +12,6 @@ public class BlockText extends BoardItem {
     fill(255);
     translate(xAt,yAt);
     textSize(20);
-    //rectMode(CENTER);
     textAlign(CENTER,CENTER);
     text(message,0,0);
     popMatrix();
